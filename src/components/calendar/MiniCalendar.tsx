@@ -6,7 +6,7 @@ import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import "assets/css/MiniCalendar.css";
 
 const MiniCalendar = () => {
-  const [value, onChange] = useState(new Date());
+  const [value, onChange] = useState<any>(new Date());
 
   return (
     <div>

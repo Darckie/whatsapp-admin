@@ -1,67 +1,66 @@
 import React from "react";
-
-// Admin Imports
+import { RoutesType } from "types/routes";
 import MainDashboard from "views/admin/default";
-import NFTMarketplace from "views/admin/marketplace";
-import Profile from "views/admin/profile";
-import DataTables from "views/admin/tables";
-import RTLDefault from "views/rtl/default";
-
-// Auth Imports
 import SignIn from "views/auth/SignIn";
-
-// Icon Imports
+import WhatsappCampaign from "views/admin/campaign/WhatsappCampaign";
+import TeamInbox from "views/admin/inbox/TeamInbox";
+import { ManageTemplate } from "views/admin/templates/ManageTemplates";
+import ManageAgents from "views/admin/manageAgents/ManageAgents";
 import {
-  MdHome,
-  MdOutlineShoppingCart,
-  MdBarChart,
-  MdPerson,
-  MdLock,
+  MdCampaign,
+  MdDashboardCustomize,
+  MdGroups,
+  MdOutlineChat,
+  MdOutlineDescription,
 } from "react-icons/md";
 
-const routes = [
+const routes: RoutesType[] = [
   {
-    name: "Main Dashboard",
+    name: "Overview",
     layout: "/admin",
     path: "default",
-    icon: <MdHome className="h-6 w-6" />,
+    icon: <MdDashboardCustomize className="h-5 w-5" />,
     component: <MainDashboard />,
+    roles: ["admin"],
   },
   {
-    name: "NFT Marketplace",
+    name: "Campaigns",
     layout: "/admin",
-    path: "nft-marketplace",
-    icon: <MdOutlineShoppingCart className="h-6 w-6" />,
-    component: <NFTMarketplace />,
-    secondary: true,
+    path: "campaigns",
+    icon: <MdCampaign className="h-5 w-5" />,
+    component: <WhatsappCampaign />,
+    roles: ["admin"],
   },
   {
-    name: "Data Tables",
+    name: "Inbox",
     layout: "/admin",
-    icon: <MdBarChart className="h-6 w-6" />,
-    path: "data-tables",
-    component: <DataTables />,
+    path: "inbox",
+    icon: <MdOutlineChat className="h-5 w-5" />,
+    component: <TeamInbox />,
+    roles: ["admin"],
   },
   {
-    name: "Profile",
+    name: "Templates",
     layout: "/admin",
-    path: "profile",
-    icon: <MdPerson className="h-6 w-6" />,
-    component: <Profile />,
+    path: "templates",
+    icon: <MdOutlineDescription className="h-5 w-5" />,
+    component: <ManageTemplate />,
+    roles: ["admin"],
+  },
+  {
+    name: "Team",
+    layout: "/admin",
+    path: "team",
+    icon: <MdGroups className="h-5 w-5" />,
+    component: <ManageAgents />,
+    roles: ["admin"],
   },
   {
     name: "Sign In",
     layout: "/auth",
     path: "sign-in",
-    icon: <MdLock className="h-6 w-6" />,
     component: <SignIn />,
   },
-  {
-    name: "RTL Admin",
-    layout: "/rtl",
-    path: "rtl",
-    icon: <MdHome className="h-6 w-6" />,
-    component: <RTLDefault />,
-  },
 ];
+
 export default routes;

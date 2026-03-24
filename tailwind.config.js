@@ -1,3 +1,5 @@
+const colors = require("tailwindcss/colors");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: "class",
@@ -135,7 +137,14 @@ module.exports = {
       "4xl-max": { max: "1850px" },
     },
     colors: () => ({
+      transparent: "transparent",
+      current: "currentColor",
+      inherit: "inherit",
+      black: "#000000",
       white: "#ffffff",
+      zinc: colors.zinc,
+      slate: colors.slate,
+      stone: colors.stone,
       lightPrimary: "#F4F7FE",
       blueSecondary: "#4318FF",
       brandLinear: "#868CFF",

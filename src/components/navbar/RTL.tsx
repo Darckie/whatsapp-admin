@@ -119,7 +119,7 @@ const Navbar = (props: {
           classNames={"py-2 top-4 -start-[230px] md:-start-[440px] w-max"}
         />
         {/* start Horizon PRO */}
-        <Dropdown
+        {/* <Dropdown
           button={
             <p className="cursor-pointer">
               <IoMdInformationCircleOutline className="h-4 w-4 text-gray-600 dark:text-white" />
@@ -160,7 +160,7 @@ const Navbar = (props: {
           }
           classNames={"py-2 top-6 -start-[250px] md:-start-[330px] w-max"}
           animation="origin-[75%_0%] md:origin-top-start transition-all duration-300 ease-in-out"
-        />
+        /> */}
         <div
           className="cursor-pointer text-gray-600"
           onClick={() => {
@@ -193,7 +193,7 @@ const Navbar = (props: {
               <div className="mt-3 ms-4">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-bold text-navy-700 dark:text-white">
-                    👋 Hey, Adela
+                    👋 Hey, Darcki
                   </p>{" "}
                 </div>
               </div>

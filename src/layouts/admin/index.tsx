@@ -1,92 +1,88 @@
 import React from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "components/navbar";
 import Sidebar from "components/sidebar";
-import Footer from "components/footer/Footer";
 import routes from "routes";
+import { RoutesType } from "types/routes";
+import { useAuth } from "context/AuthContext";
 
 export default function Admin(props: { [x: string]: any }) {
   const { ...rest } = props;
   const location = useLocation();
-  const [open, setOpen] = React.useState(true);
-  const [currentRoute, setCurrentRoute] = React.useState("Main Dashboard");
+  const [open, setOpen] = React.useState(false);
+  const [currentRoute, setCurrentRoute] = React.useState("Overview");
+  const { user } = useAuth();
+
+  const filterRoutesByRole = (routeList: RoutesType[]) => {
+    return routeList.reduce<RoutesType[]>((acc, route) => {
+      if (route.layout !== "/admin") {
+        return acc;
+      }
+
+      if (route.roles?.length) {
+        const userRoles = user?.roles || [];
+        const allowed = route.roles.some((role) => userRoles.includes(role));
+        if (!allowed) {
+          return acc;
+        }
+      }
+
+      acc.push(route);
+      return acc;
+    }, []);
+  };
+
+  const allowedRoutes = filterRoutesByRole(routes);
 
   React.useEffect(() => {
-    window.addEventListener("resize", () =>
-      window.innerWidth < 1200 ? setOpen(false) : setOpen(true)
-    );
+    const handleResize = () => {
+      setOpen(window.innerWidth >= 1024);
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
-  React.useEffect(() => {
-    getActiveRoute(routes);
-  }, [location.pathname]);
 
-  const getActiveRoute = (routes: RoutesType[]): string | boolean => {
-    let activeRoute = "Main Dashboard";
-    for (let i = 0; i < routes.length; i++) {
-      if (
-        window.location.href.indexOf(
-          routes[i].layout + "/" + routes[i].path
-        ) !== -1
-      ) {
-        setCurrentRoute(routes[i].name);
-      }
-    }
-    return activeRoute;
-  };
-  const getActiveNavbar = (routes: RoutesType[]): string | boolean => {
-    let activeNavbar = false;
-    for (let i = 0; i < routes.length; i++) {
-      if (
-        window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1
-      ) {
-        return routes[i].secondary;
-      }
-    }
-    return activeNavbar;
-  };
-  const getRoutes = (routes: RoutesType[]): any => {
-    return routes.map((prop, key) => {
-      if (prop.layout === "/admin") {
-        return (
-          <Route path={`/${prop.path}`} element={prop.component} key={key} />
-        );
-      } else {
-        return null;
-      }
-    });
-  };
+  React.useEffect(() => {
+    const activeRoute = allowedRoutes.find(
+      (route) => location.pathname === `${route.layout}/${route.path}`,
+    );
+    setCurrentRoute(activeRoute?.name || "Overview");
+  }, [allowedRoutes, location.pathname]);
+
+  const getRoutes = (list: RoutesType[]) =>
+    list.map((route) => (
+      <Route key={`${route.layout}-${route.path}`} path={route.path} element={route.component} />
+    ));
 
   document.documentElement.dir = "ltr";
-  return (
-    <div className="flex h-full w-full">
-      <Sidebar open={open} onClose={() => setOpen(false)} />
-      {/* Navbar & Main Content */}
-      <div className="h-full w-full bg-lightPrimary dark:!bg-navy-900">
-        {/* Main Content */}
-        <main
-          className={`mx-[12px] h-full flex-none transition-all md:pr-2 xl:ml-[313px]`}
-        >
-          {/* Routes */}
-          <div className="h-full">
-            <Navbar
-              onOpenSidenav={() => setOpen(true)}
-              brandText={currentRoute}
-              secondary={getActiveNavbar(routes)}
-              {...rest}
-            />
-            <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-2 md:pr-2">
-              <Routes>
-                {getRoutes(routes)}
 
-                <Route
-                  path="/"
-                  element={<Navigate to="/admin/default" replace />}
-                />
-              </Routes>
-            </div>
-            <div className="p-3">
-              <Footer />
-            </div>
+  return (
+    <div className="min-h-screen bg-[#f6f5f2] text-zinc-900">
+      <Sidebar
+        routes={allowedRoutes}
+        open={open}
+        onClose={() => setOpen(false)}
+        onOpen={() => setOpen(true)}
+      />
+
+      <div className="lg:pl-[248px]">
+        <Navbar
+          onOpenSidenav={() => setOpen(true)}
+          brandText={currentRoute}
+          secondary={false}
+          {...rest}
+        />
+
+        <main className="px-4 pb-8 pt-2 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1440px]">
+            <Routes>
+              {getRoutes(allowedRoutes)}
+              <Route path="/" element={<Navigate to="/admin/default" replace />} />
+              <Route path="*" element={<Navigate to="/admin/default" replace />} />
+            </Routes>
           </div>
         </main>
       </div>

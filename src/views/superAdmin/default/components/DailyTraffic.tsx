@@ -7,7 +7,7 @@ const DailyTraffic = () => {
   return (
     <Card extra="pb-7 p-[20px]">
       <div className="flex flex-row justify-between">
-        <div className="pt-2 ms-1">
+        <div className="ml-1 pt-2">
           <p className="text-sm font-medium leading-4 text-gray-600">
             Daily Traffic
           </p>

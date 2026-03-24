@@ -1,80 +1,128 @@
-import InputField from "components/fields/InputField";
-import { FcGoogle } from "react-icons/fc";
-import Checkbox from "components/checkbox";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { useAuth } from "../../context/AuthContext";
+import { mockUser } from "data/mockData";
+import {
+  Button,
+  InputField,
+  PageTransition,
+  SurfaceCard,
+} from "components/dashboard/ui";
 
 export default function SignIn() {
-  return (
-    <div className="mt-16 mb-16 flex h-full w-full items-center justify-center px-2 md:mx-0 md:px-0 lg:mb-10 lg:items-center lg:justify-start">
-      {/* Sign in section */}
-      <div className="mt-[10vh] w-full max-w-full flex-col items-center md:pl-4 lg:pl-0 xl:max-w-[420px]">
-        <h4 className="mb-2.5 text-4xl font-bold text-navy-700 dark:text-white">
-          Sign In
-        </h4>
-        <p className="mb-9 ml-1 text-base text-gray-600">
-          Enter your email and password to sign in!
-        </p>
-        <div className="mb-6 flex h-[50px] w-full items-center justify-center gap-2 rounded-xl bg-lightPrimary hover:cursor-pointer dark:bg-navy-800">
-          <div className="rounded-full text-xl">
-            <FcGoogle />
-          </div>
-          <h5 className="text-sm font-medium text-navy-700 dark:text-white">
-            Sign In with Google
-          </h5>
-        </div>
-        <div className="mb-6 flex items-center  gap-3">
-          <div className="h-px w-full bg-gray-200 dark:bg-navy-700" />
-          <p className="text-base text-gray-600 dark:text-white"> or </p>
-          <div className="h-px w-full bg-gray-200 dark:bg-navy-700" />
-        </div>
-        {/* Email */}
-        <InputField
-          variant="auth"
-          extra="mb-3"
-          label="Email*"
-          placeholder="mail@simmmple.com"
-          id="email"
-          type="text"
-        />
+  const navigate = useNavigate();
+  const { login, user } = useAuth();
+  const [email, setEmail] = useState(mockUser.email);
+  const [password, setPassword] = useState("demo1234");
+  const [remember, setRemember] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-        {/* Password */}
-        <InputField
-          variant="auth"
-          extra="mb-3"
-          label="Password*"
-          placeholder="Min. 8 characters"
-          id="password"
-          type="password"
-        />
-        {/* Checkbox */}
-        <div className="mb-4 flex items-center justify-between px-2">
-          <div className="flex items-center">
-            <Checkbox />
-            <p className="ml-2 text-sm font-medium text-navy-700 dark:text-white">
-              Keep me logged In
-            </p>
+  React.useEffect(() => {
+    if (user) {
+      navigate("/admin/default");
+    }
+  }, [user, navigate]);
+
+  const handleSignIn = async () => {
+    setError("");
+
+    if (!email || !password) {
+      setError("Email and password are required.");
+      return;
+    }
+
+    if (!email.includes("@")) {
+      setError("Enter a valid work email.");
+      return;
+    }
+
+    setLoading(true);
+    await new Promise((resolve) => window.setTimeout(resolve, 450));
+
+    if (password.length < 6) {
+      setError("Use the demo password or any value with at least 6 characters.");
+      setLoading(false);
+      return;
+    }
+
+    login(mockUser, remember ? "mock-session" : null);
+    toast.success(`Welcome back, ${mockUser.full_name}.`);
+    navigate("/admin/default");
+    setLoading(false);
+  };
+
+  return (
+    <PageTransition>
+      <SurfaceCard className="overflow-hidden">
+        <div className="border-b border-zinc-200 px-8 py-7">
+          <h4 className="font-display text-[24px] font-semibold tracking-[-0.04em] text-zinc-950">
+            Sign in to continue
+          </h4>
+          <p className="mt-2 text-[13px] leading-6 text-zinc-500">
+            Access your workspace.
+          </p>
+        </div>
+
+        <div className="space-y-5 px-8 py-7">
+          <div className="grid gap-3 rounded-[8px] border border-blue-100 bg-blue-50 p-4 text-[13px] text-zinc-600">
+            <div className="flex items-center justify-between gap-4">
+              <span>Email</span>
+              <span className="font-medium text-zinc-900">{mockUser.email}</span>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <span>Password</span>
+              <span className="font-medium text-zinc-900">demo1234</span>
+            </div>
           </div>
-          <a
-            className="text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white"
-            href=" "
+
+          {error ? (
+            <div className="rounded-[6px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              {error}
+            </div>
+          ) : null}
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSignIn();
+            }}
+            className="space-y-4"
           >
-            Forgot Password?
-          </a>
+            <InputField
+              label="Work email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="rahul.sharma@pulseadmin.in"
+            />
+            <InputField
+              label="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+            />
+
+            <div className="flex items-center justify-between gap-3">
+              <label className="flex items-center gap-2 text-[13px] text-zinc-500">
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  className="h-4 w-4 rounded-[4px] border-zinc-300 text-blue-600 focus:ring-blue-200"
+                />
+                Keep me signed in
+              </label>
+            </div>
+
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Signing in..." : "Enter dashboard"}
+            </Button>
+          </form>
         </div>
-        <button className="linear mt-2 w-full rounded-xl bg-brand-500 py-[12px] text-base font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200">
-          Sign In
-        </button>
-        <div className="mt-4">
-          <span className=" text-sm font-medium text-navy-700 dark:text-gray-600">
-            Not registered yet?
-          </span>
-          <a
-            href=" "
-            className="ml-1 text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white"
-          >
-            Create an account
-          </a>
-        </div>
-      </div>
-    </div>
+      </SurfaceCard>
+    </PageTransition>
   );
 }
